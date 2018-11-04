@@ -894,6 +894,7 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
     {
         FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
         Editor_OnKillFocus(hEdit, (HWND)wParam);
+		Grid_NotifyParent();
     }
     else if (WM_PAINT == msg)   // Obliterate border
     {
@@ -913,7 +914,11 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
         }
         ShowWindow(hEdit, SW_HIDE);
         SetFocus(g_lpInst->hwndListBox);
-        Grid_NotifyParent();
+
+		//
+		// Don't notify the parent here! Loosing the focus will do this anyways
+		//
+
         return TRUE;    // handle Enter (NO BELL)
     }
     else if (WM_KEYDOWN == msg)
@@ -1575,6 +1580,7 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         {
             FORWARD_WM_CHAR(hwnd, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
             Editor_OnKillFocus(hwnd, (HWND) wParam);
+			Grid_NotifyParent();
         }
     }
     else if (WM_PAINT == msg && !fEdit) // Obliterate border (differs from standard method)
@@ -1633,8 +1639,12 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         else
             ShowWindow(hwnd, SW_HIDE);
 
-        SetFocus(g_lpInst->hwndListBox);
-        Grid_NotifyParent();
+		SetFocus(g_lpInst->hwndListBox);
+
+		//
+		// Don't notify the parent here! Loosing the focus will do this anyways
+		//
+
         return TRUE;    // handle Enter (NO BELL)
     }
     else if (WM_CHAR == msg && VK_TAB == wParam)
