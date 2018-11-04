@@ -1675,7 +1675,7 @@ static HWND CreateCombo(HINSTANCE hInstance, HWND hwndParent, INT id, BOOL fEdit
     DWORD dwStyle, dwExStyle;
     HWND hwnd;
 
-    dwStyle = WS_CHILD | CBS_NOINTEGRALHEIGHT | (fEditable ? CBS_DROPDOWN : CBS_DROPDOWNLIST);
+    dwStyle = WS_CHILD | CBS_NOINTEGRALHEIGHT | WS_VSCROLL | (fEditable ? CBS_DROPDOWN : CBS_DROPDOWNLIST);
 
     dwExStyle = WS_EX_LEFT;
 

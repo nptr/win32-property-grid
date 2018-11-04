@@ -272,7 +272,7 @@ BOOL Main_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     _sntprintf(gDemoData.strProp1, NELEMS(gDemoData.strProp1),_T("Property Grid demo"));
     
     _tmemset(gDemoData.strProp2,_T('\0'),NELEMS(gDemoData.strProp2));
-    _tmemmove(gDemoData.sczzChoices, _T("Item1\0Item2\0Item3\0Item4\0Item5\0"), NELEMS(gDemoData.sczzChoices));
+    _tmemmove(gDemoData.sczzChoices, _T("Item1\0Item2\0Item3\0Item4\0Item5\0Item6\0Item7\0Item8\0Item9\0Item10\0Item11\0"), NELEMS(gDemoData.sczzChoices));
 
     _tmemset(gDemoData.strProp3,_T('\0'),NELEMS(gDemoData.strProp3));
     TCHAR szzChoices[] = _T("Robert\0Wally\0Mike\0Vickie\0Leah\0Arthur\0");
