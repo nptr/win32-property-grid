@@ -116,6 +116,7 @@ typedef struct tagPROPGRIDITEM {
     LPTSTR lpszzCmbItems; ///< Double null terminated list of strings
     LPTSTR lpszPropDesc;  ///< Property (item) description
     LPARAM lpCurValue;    ///< Property (item) value
+	LPVOID lpUserData;    ///< Additional user data
     INT    iItemType;     ///< Property (item) type identifier
 } PROPGRIDITEM, *LPPROPGRIDITEM;
 
