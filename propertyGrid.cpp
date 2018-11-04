@@ -4183,7 +4183,7 @@ HWND New_PropertyGrid(HWND hParent, DWORD dwID)
         aPropertyGrid = InitPropertyGrid(hinst);
 
     hPropertyGrid = CreateWindowEx(0, g_szClassName, _T(""),
-         WS_CHILD | WS_TABSTOP, 0, 0, 0, 0, hParent, (HMENU)dwID, hinst, NULL);
+         WS_CHILD | WS_TABSTOP | WS_VISIBLE, 0, 0, 0, 0, hParent, (HMENU)dwID, hinst, NULL);
 
     return hPropertyGrid;
 }
