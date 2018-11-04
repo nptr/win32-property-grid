@@ -249,6 +249,7 @@ typedef struct tagLISTBOXITEM {
     LPTSTR lpszCurValue;///< Property (item) value
 	LPVOID lpUserData;  ///< Additional user data
     INT iItemType;      ///< Property (item) type identifier
+	INT iSelIndex;      ///< Selected index for combobox items
     BOOL fCollapsed;    ///< Catalog (group) collapsed flag
 } LISTBOXITEM , *LPLISTBOXITEM;
 
@@ -418,6 +419,7 @@ static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurVa
 
     lpItem->lpszPropDesc = NewString(szPropDesc);
 	lpItem->lpUserData = lpUserData;
+	lpItem->iSelIndex = 0;
 
     return lpItem;
 }
@@ -1631,6 +1633,7 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     {
         if (NULL != g_lpInst->lpCurrent)
         {
+			g_lpInst->lpCurrent->iSelIndex = ComboBox_GetCurSel(hwnd);
             GetWindowText(hwnd, classname, sizeof classname);   //Combo or child edit text is the same
             AllocatedString_Replace(g_lpInst->lpCurrent->lpszCurValue, classname);
         }
@@ -3820,6 +3823,7 @@ static LRESULT Grid_OnGetItemData(INT iItem)
             pgi.lpszPropDesc = pItem->lpszPropDesc;
             pgi.iItemType = pItem->iItemType;
 			pgi.lpUserData = pItem->lpUserData;
+			pgi.iSelIndex = pItem->iSelIndex;
 
             switch (pgi.iItemType)
             {
