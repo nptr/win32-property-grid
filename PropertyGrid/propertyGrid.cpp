@@ -28,6 +28,7 @@
 //DWM 1.7: Version 1.7 changes labelled thus.
 //DWM 1.8: Version 1.8 changes labelled thus.
 //DWM 1.9: Version 1.9 changes labelled thus.
+//DWM 2.0: Version 2.0 changes labelled thus.
 
 //DWM 1.9: Suppress POCC Warning "Argument x to 'sscanf' does not match the format string; 
 //          expected 'unsigned char *' but found 'unsigned long'"
@@ -890,7 +891,6 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
     }
     else if (WM_KILLFOCUS == msg)
     {
-        FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
         Editor_OnKillFocus(hEdit, (HWND)wParam);
     }
     else if (WM_PAINT == msg)   // Obliterate border
@@ -918,12 +918,9 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
     {
         switch (wParam)
         {
-            case VK_TAB:
-                if (GetKeyState(VK_SHIFT) & 0x8000)
-                {
-                    FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);
-                }
-                else //DWM 1.3: Added Focus to grid parent
+            case VK_TAB://DWM 2.0: Rewrote to change trigger Notification 
+				FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);
+                if (!(GetKeyState(VK_SHIFT) & 0x8000))
                 {
                     SetFocusToParent();
                 }
@@ -1064,7 +1061,9 @@ static LRESULT CALLBACK IpEdit_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
                 hNext = GetWindow(hwnd, GW_HWNDNEXT);
                 if (NULL == hNext) //DWM 1.3: Added Focus to Listbox
                 {
-                    SetFocus(g_lpInst->hwndListBox);
+					//DWM 2.0: Changed to FORWARD_WM_CHAR to set focus to Listbox and 
+					// trigger WM_NOTIFY
+					FORWARD_WM_CHAR(hIpEdit, VK_RETURN, 0, SNDMSG);
                     return TRUE;
                 }
             }
@@ -1073,8 +1072,10 @@ static LRESULT CALLBACK IpEdit_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
                 hNext = GetWindow(hwnd, GW_HWNDPREV);
                 if (NULL == hNext) //DWM 1.3: Added Focus to grid parent
                 {
-                    SetFocusToParent();
+					//DWM 2.0: Changed to FORWARD_WM_CHAR to trigger WM_NOTIFY
+					FORWARD_WM_CHAR(hIpEdit, VK_RETURN, 0, SNDMSG);
                     Editor_OnKillFocus(hIpEdit, NULL);
+					SetFocusToParent();
                     return TRUE;
                 }
             }
@@ -1571,7 +1572,6 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         HWND hFocus = (HWND) wParam;
         if(hwnd != GetParent(hFocus))// not a combobox editor or a combobox
         {
-            FORWARD_WM_CHAR(hwnd, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
             Editor_OnKillFocus(hwnd, (HWND) wParam);
         }
     }
@@ -1644,8 +1644,10 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         else //DWM 1.3: Added Focus to grid parent
         {
             ShowWindow(fEdit ? GetParent(hwnd) : hwnd, SW_HIDE);
-            SetFocusToParent();
+			//DWM 2.0: Changed to FORWARD_WM_CHAR to trigger WM_NOTIFY
+			FORWARD_WM_CHAR(hwnd, VK_RETURN, 0, SNDMSG);
             Editor_OnKillFocus(hwnd, NULL);
+			SetFocusToParent();
         }
         return TRUE;
     }
@@ -1675,7 +1677,8 @@ static HWND CreateCombo(HINSTANCE hInstance, HWND hwndParent, INT id, BOOL fEdit
     DWORD dwStyle, dwExStyle;
     HWND hwnd;
 
-    dwStyle = WS_CHILD | CBS_NOINTEGRALHEIGHT | (fEditable ? CBS_DROPDOWN : CBS_DROPDOWNLIST);
+	//DWM 2.0: Added WS_VSCROLL per user suggestion
+    dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | (fEditable ? CBS_DROPDOWN : CBS_DROPDOWNLIST);
 
     dwExStyle = WS_EX_LEFT;
 
@@ -2772,6 +2775,18 @@ static VOID ListBox_OnKeyDown(HWND hwnd, UINT vk, BOOL fDown, INT cRepeat, UINT 
                 ToggleCatalog(g_lpInst->lpCurrent);
                 fHandled = TRUE;
             }
+			//DWM 2.0: Added Keith S. Robertson suggestion begin.
+		    else if ((VK_ADD == vk || VK_OEM_PLUS == vk) && g_lpInst->lpCurrent->fCollapsed || (VK_SUBTRACT == vk || VK_OEM_MINUS == vk) && !g_lpInst->lpCurrent->fCollapsed)
+		    {
+		        ToggleCatalog(g_lpInst->lpCurrent);
+		        fHandled = TRUE;
+		    }
+		    else if (VK_SPACE == vk)
+		    {
+		        ToggleCatalog(g_lpInst->lpCurrent);
+		        fHandled = TRUE;
+		    }
+			//DWM 2.0: Added end.
         }
         if (PIT_CHECK == g_lpInst->lpCurrent->iItemType && (VK_SPACE == vk || VK_RETURN == vk))
         {
@@ -3915,7 +3930,14 @@ static BOOL Grid_OnGetSel(INT iItem)
 /// @returns VOID.
 static VOID Grid_OnResetContent(VOID)
 {
-    ListBox_ResetContent(g_lpInst->hwndListMap);
+	LPLISTBOXITEM pItem;
+
+	//DWM 2.0: Collapse all open catalogs to avoid freeing memory twice.
+	Grid_CollapseCatalog(NULL);
+
+	ListBox_ResetContent(g_lpInst->hwndListBox); //free catalog entries.
+
+    ListBox_ResetContent(g_lpInst->hwndListMap); //free all other entries.
 
     if (NULL != g_lpInst->hwndCtl1)
     {
@@ -3927,7 +3949,6 @@ static VOID Grid_OnResetContent(VOID)
         DestroyWindow(g_lpInst->hwndCtl2);
         g_lpInst->hwndCtl2 = NULL;
     }
-    ListBox_ResetContent(g_lpInst->hwndListBox);
     Static_SetText(g_lpInst->hwndPropDesc,_T("")); //DWM 1.2: Clear the property pane
 }
 
@@ -4122,7 +4143,8 @@ static VOID Grid_OnDestroy(HWND hwnd)
 {
     if (NULL != g_lpInst)
     {
-        ListBox_ResetContent(g_lpInst->hwndListMap); //Delete all Items
+		//DWM 2.0: Changed following line from ListBox_ResetContent to PropGrid_ResetContent()
+        PropGrid_ResetContent(hwnd); //Delete all Items
         DestroyWindow(g_lpInst->hwndListMap);
         DestroyWindow(g_lpInst->hwndListBox);
 
@@ -4182,8 +4204,9 @@ HWND New_PropertyGrid(HWND hParent, DWORD dwID)
     if (!aPropertyGrid)
         aPropertyGrid = InitPropertyGrid(hinst);
 
+	//DWM 2.0: Added WS_VISIBLE per user suggestion
     hPropertyGrid = CreateWindowEx(0, g_szClassName, _T(""),
-         WS_CHILD | WS_TABSTOP, 0, 0, 0, 0, hParent, (HMENU)dwID, hinst, NULL);
+         WS_CHILD | WS_TABSTOP | WS_VISIBLE, 0, 0, 0, 0, hParent, (HMENU)dwID, hinst, NULL);
 
     return hPropertyGrid;
 }
