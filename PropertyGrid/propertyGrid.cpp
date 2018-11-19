@@ -3947,6 +3947,8 @@ static VOID Grid_OnResetContent(VOID)
 
     ListBox_ResetContent(g_lpInst->hwndListMap); //free all other entries.
 
+    g_lpInst->lpCurrent = NULL;
+
     if (NULL != g_lpInst->hwndCtl1)
     {
         DestroyWindow(g_lpInst->hwndCtl1);
@@ -3958,7 +3960,6 @@ static VOID Grid_OnResetContent(VOID)
         g_lpInst->hwndCtl2 = NULL;
     }
 
-    g_lpInst->lpCurrent = NULL;
     Static_SetText(g_lpInst->hwndPropDesc,_T("")); //DWM 1.2: Clear the property pane
 }
 
