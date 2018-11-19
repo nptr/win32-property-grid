@@ -247,9 +247,9 @@ typedef struct tagLISTBOXITEM {
     LPTSTR lpszMisc;    ///< Item specific data string
     LPTSTR lpszPropDesc;///< Property (item) description
     LPTSTR lpszCurValue;///< Property (item) value
-	LPVOID lpUserData;  ///< Additional user data
+    LPVOID lpUserData;  ///< Additional user data
     INT iItemType;      ///< Property (item) type identifier
-	INT iSelIndex;      ///< Selected index for combobox items
+    INT iSelIndex;      ///< Selected index for combobox items
     BOOL fCollapsed;    ///< Catalog (group) collapsed flag
 } LISTBOXITEM , *LPLISTBOXITEM;
 
@@ -418,8 +418,8 @@ static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurVa
         lpItem->lpszMisc = NewString(szMisc);
 
     lpItem->lpszPropDesc = NewString(szPropDesc);
-	lpItem->lpUserData = lpUserData;
-	lpItem->iSelIndex = 0;
+    lpItem->lpUserData = lpUserData;
+    lpItem->iSelIndex = 0;
 
     return lpItem;
 }
@@ -896,7 +896,7 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
     {
         FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
         Editor_OnKillFocus(hEdit, (HWND)wParam);
-		Grid_NotifyParent();
+        Grid_NotifyParent();
     }
     else if (WM_PAINT == msg)   // Obliterate border
     {
@@ -917,9 +917,9 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
         ShowWindow(hEdit, SW_HIDE);
         SetFocus(g_lpInst->hwndListBox);
 
-		//
-		// Don't notify the parent here! Loosing the focus will do this anyways
-		//
+        //
+        // Don't notify the parent here! Loosing the focus will do this anyways
+        //
 
         return TRUE;    // handle Enter (NO BELL)
     }
@@ -1582,7 +1582,7 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         {
             FORWARD_WM_CHAR(hwnd, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
             Editor_OnKillFocus(hwnd, (HWND) wParam);
-			Grid_NotifyParent();
+            Grid_NotifyParent();
         }
     }
     else if (WM_PAINT == msg && !fEdit) // Obliterate border (differs from standard method)
@@ -1633,7 +1633,7 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
     {
         if (NULL != g_lpInst->lpCurrent)
         {
-			g_lpInst->lpCurrent->iSelIndex = ComboBox_GetCurSel(hwnd);
+            g_lpInst->lpCurrent->iSelIndex = ComboBox_GetCurSel(hwnd);
             GetWindowText(hwnd, classname, sizeof classname);   //Combo or child edit text is the same
             AllocatedString_Replace(g_lpInst->lpCurrent->lpszCurValue, classname);
         }
@@ -1642,11 +1642,11 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         else
             ShowWindow(hwnd, SW_HIDE);
 
-		SetFocus(g_lpInst->hwndListBox);
+        SetFocus(g_lpInst->hwndListBox);
 
-		//
-		// Don't notify the parent here! Loosing the focus will do this anyways
-		//
+        //
+        // Don't notify the parent here! Loosing the focus will do this anyways
+        //
 
         return TRUE;    // handle Enter (NO BELL)
     }
@@ -3822,8 +3822,8 @@ static LRESULT Grid_OnGetItemData(INT iItem)
             pgi.lpszzCmbItems = pItem->lpszMisc;
             pgi.lpszPropDesc = pItem->lpszPropDesc;
             pgi.iItemType = pItem->iItemType;
-			pgi.lpUserData = pItem->lpUserData;
-			pgi.iSelIndex = pItem->iSelIndex;
+            pgi.lpUserData = pItem->lpUserData;
+            pgi.iSelIndex = pItem->iSelIndex;
 
             switch (pgi.iItemType)
             {

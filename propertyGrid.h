@@ -116,9 +116,9 @@ typedef struct tagPROPGRIDITEM {
     LPTSTR lpszzCmbItems; ///< Double null terminated list of strings
     LPTSTR lpszPropDesc;  ///< Property (item) description
     LPARAM lpCurValue;    ///< Property (item) value
-	LPVOID lpUserData;    ///< Additional user data
+    LPVOID lpUserData;    ///< Additional user data
     INT    iItemType;     ///< Property (item) type identifier
-	INT    iSelIndex;     ///< Selected index for combobox items (read-only)
+    INT    iSelIndex;     ///< Selected index for combobox items (read-only)
 } PROPGRIDITEM, *LPPROPGRIDITEM;
 
 /// @var NMPROPGRID
