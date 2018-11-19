@@ -3068,6 +3068,11 @@ static VOID ListBox_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify)
 /// @returns VOID.
 static VOID Grid_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 {
+    if (NULL == g_lpInst)
+    {
+        return;
+    }
+
     g_lpInst->iVDivider = cy - g_lpInst->iDescHeight;
 
     if (NULL != g_lpInst->hwndPropDesc)
