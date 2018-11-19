@@ -3954,6 +3954,8 @@ static VOID Grid_OnResetContent(VOID)
         DestroyWindow(g_lpInst->hwndCtl2);
         g_lpInst->hwndCtl2 = NULL;
     }
+
+    g_lpInst->lpCurrent = NULL;
     Static_SetText(g_lpInst->hwndPropDesc,_T("")); //DWM 1.2: Clear the property pane
 }
 
