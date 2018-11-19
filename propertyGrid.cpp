@@ -3932,7 +3932,7 @@ static BOOL Grid_OnGetSel(INT iItem)
 /// @returns VOID.
 static VOID Grid_OnResetContent(VOID)
 {
-    ListBox_ResetContent(g_lpInst->hwndListMap);
+    ListBox_ResetContent(g_lpInst->hwndListBox);
 
     if (NULL != g_lpInst->hwndCtl1)
     {
@@ -3944,8 +3944,10 @@ static VOID Grid_OnResetContent(VOID)
         DestroyWindow(g_lpInst->hwndCtl2);
         g_lpInst->hwndCtl2 = NULL;
     }
-    ListBox_ResetContent(g_lpInst->hwndListBox);
-    Static_SetText(g_lpInst->hwndPropDesc,_T("")); //DWM 1.2: Clear the property pane
+
+    ListBox_ResetContent(g_lpInst->hwndListMap);
+    g_lpInst->lpCurrent = NULL;
+    Static_SetText(g_lpInst->hwndPropDesc, _T("")); //DWM 1.2: Clear the property pane
 }
 
 /// @brief Handles LB_SETCURSEL message sent to the grid.
