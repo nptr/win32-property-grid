@@ -248,6 +248,7 @@ typedef struct tagLISTBOXITEM {
     LPTSTR lpszMisc;    ///< Item specific data string
     LPTSTR lpszPropDesc;///< Property (item) description
     LPTSTR lpszCurValue;///< Property (item) value
+    LPVOID lpUserData;  ///< Additional user data
     INT iItemType;      ///< Property (item) type identifier
     BOOL fCollapsed;    ///< Catalog (group) collapsed flag
 } LISTBOXITEM , *LPLISTBOXITEM;
@@ -402,7 +403,7 @@ static LPTSTR NewStringArray(LPTSTR szzStr)
 /// @param iItemType The item type designation.
 ///
 /// @returns a Pointer to the allocated list box item.
-static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurValue, LPTSTR szMisc, LPTSTR szPropDesc, INT iItemType)
+static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurValue, LPTSTR szMisc, LPTSTR szPropDesc, INT iItemType, LPVOID lpUserData = NULL)
 {
     LPLISTBOXITEM lpItem = (LPLISTBOXITEM)calloc(1, sizeof(LISTBOXITEM));
 
@@ -417,6 +418,7 @@ static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurVa
         lpItem->lpszMisc = NewString(szMisc);
 
     lpItem->lpszPropDesc = NewString(szPropDesc);
+    lpItem->lpUserData = lpUserData; // user managed memory
 
     return lpItem;
 }
@@ -3759,7 +3761,7 @@ static INT Grid_OnAddString(LPPROPGRIDITEM pgi)
             break;
     }
     lpi = NewItem(pgi->lpszCatalog, pgi->lpszPropName,
-            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType);
+            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType, pgi->lpUserData);
 
     return ListBox_AddItemData(g_lpInst->hwndListMap, lpi);
 }
@@ -3827,6 +3829,7 @@ static LRESULT Grid_OnGetItemData(INT iItem)
             pgi.lpszzCmbItems = pItem->lpszMisc;
             pgi.lpszPropDesc = pItem->lpszPropDesc;
             pgi.iItemType = pItem->iItemType;
+            pgi.lpUserData = pItem->lpUserData;
 
             switch (pgi.iItemType)
             {
@@ -4075,7 +4078,7 @@ static LRESULT Grid_OnSetItemData(INT iItem, LPPROPGRIDITEM pgi)
         //Do not allow the catalog to change; to do so would necessitate moving
         // the item to a different index throwing off the indexing for items.
         lpiNew = NewItem(lpiCurrent->lpszCatalog, pgi->lpszPropName,
-            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType);
+            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType, pgi->lpUserData);
 
         //Set new data
         lrtn = ListBox_SetItemData(g_lpInst->hwndListMap, iItem, lpiNew);
